@@ -34,3 +34,4 @@ t/12-question-decode.t
 t/13-rr-decode.t
 t/14-rr-send.t
 META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

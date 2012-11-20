@@ -1,10 +1,10 @@
 #
-# $Id: DNS.pm 49 2009-05-31 13:15:34Z VinsWorldcom $
+# $Id: DNS.pm 49 2012-11-19 13:15:34Z VinsWorldcom $
 #
 package Net::Frame::Layer::DNS;
 use strict; use warnings;
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 use Net::Frame::Layer qw(:consts :subs);
 use Exporter;
@@ -90,6 +90,7 @@ __PACKAGE__->cgBuildAccessorsScalar(\@AS);
 
 #no strict 'vars';
 
+use Bit::Vector;
 use Net::Frame::Layer::DNS::Constants qw(:consts);
 
 my $dns_payload;
@@ -135,14 +136,15 @@ sub getLength { 12 }
 sub pack {
    my $self = shift;
 
-   my $bytes34 = ($self->qr << 15) |
-                 (0x7800 & ($self->opcode << 11)) |
-                 (0x07f0 & $self->flags << 4) |
-                 (0x000f & $self->rcode);
+   my $qr     = Bit::Vector->new_Dec(1, $self->qr);
+   my $opcode = Bit::Vector->new_Dec(4, $self->opcode);
+   my $flags  = Bit::Vector->new_Dec(7, $self->flags);
+   my $rcode  = Bit::Vector->new_Dec(4, $self->rcode);
+   my $bvlist = $qr->Concat_List($opcode, $flags, $rcode);
 
    my $raw = $self->SUPER::pack('nnnnnn',
       $self->id,
-      $bytes34,
+      $bvlist->to_Dec,
       $self->qdCount,
       $self->anCount,
       $self->nsCount,
@@ -157,15 +159,18 @@ sub unpack {
 
    $dns_payload = $self->raw;
 
-   my ($id, $bytes34, $qdCount, $anCount, $nsCount, $arCount, $payload) =
+   my ($id, $bv, $qdCount, $anCount, $nsCount, $arCount, $payload) =
       $self->SUPER::unpack('nnnnnn a*', $self->raw)
          or return;
 
    $self->id($id);
-   $self->qr    (($bytes34 & 0x8000) >> 15);
-   $self->opcode(($bytes34 & 0x7800) >> 11);
-   $self->flags (($bytes34 & 0x07f0) >> 4);
-   $self->rcode  ($bytes34 & 0x000f);
+
+   my $bvlist = Bit::Vector->new_Dec(16, $bv);
+   $self->qr    ($bvlist->Chunk_Read(1,15));
+   $self->opcode($bvlist->Chunk_Read(4,11));
+   $self->flags ($bvlist->Chunk_Read(7, 4));
+   $self->rcode ($bvlist->Chunk_Read(4, 0));
+
    $self->qdCount($qdCount);
    $self->anCount($anCount);
    $self->nsCount($nsCount);
