@@ -1,10 +1,10 @@
 #
-# $Id: DNS.pm 49 2012-11-19 13:15:34Z VinsWorldcom $
+# $Id: DNS.pm 49 2013-03-04 13:15:34Z VinsWorldcom $
 #
 package Net::Frame::Layer::DNS;
 use strict; use warnings;
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 use Net::Frame::Layer qw(:consts :subs);
 use Exporter;

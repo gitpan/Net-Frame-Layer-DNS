@@ -27,7 +27,7 @@ use Net::Frame::Layer::DNS::RR::AAAA;
 
 my ($rdata, $rr, $expectedOutput, $packetA, $packetAAAA);
 
-my $eth   = Net::Frame::Layer::ETH->new(src=>'C4:17:FE:12:7D:75',dst=>'58:6d:8f:78:ad:40');
+my $eth   = Net::Frame::Layer::ETH->new(src=>'c4:17:fe:12:7d:75',dst=>'58:6d:8f:78:ad:40');
 my $ipv4  = Net::Frame::Layer::IPv4->new(id=>16383,src=>'192.168.10.100',dst=>'10.10.10.10',protocol=>NF_IPv4_PROTOCOL_UDP);
 my $udp   = Net::Frame::Layer::UDP->new(dst=>1025,src=>53);
 my $dns   = Net::Frame::Layer::DNS->new(id=>16384,anCount=>1);

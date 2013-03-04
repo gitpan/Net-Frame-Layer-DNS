@@ -112,7 +112,9 @@ sub encapsulate {
    return $self->nextLayer if $self->nextLayer;
 
    if ($self->payload) {
-      if ($self->type == NF_DNS_TYPE_A) {
+      if ($self->rdlength == 0) {
+         return "DNS::RR"
+      } elsif ($self->type == NF_DNS_TYPE_A) {
          return "DNS::RR::A"
       } elsif ($self->type == NF_DNS_TYPE_AAAA) {
          return "DNS::RR::AAAA"
